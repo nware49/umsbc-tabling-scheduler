@@ -1,0 +1,481 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>UMSBC Tabling Scheduler</title>
+  <meta name="description" content="Build a fair weekly tabling schedule for UMSBC from your board's availability. Runs entirely in your browser.">
+  <meta name="theme-color" content="#2068C8">
+  <link rel="icon" href="img/favicon.ico" sizes="any">
+  <link rel="icon" type="image/png" href="img/logo.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to main content</a>
+
+  <header class="site-header">
+    <div class="wrap header-row">
+      <a class="brand" href="#/generate" aria-label="UMSBC Tabling Scheduler home">
+        <img src="img/logo.png" width="44" height="44" alt="">
+        <span class="brand-text"><strong>UMSBC</strong> Tabling Scheduler</span>
+      </a>
+      <nav aria-label="Main">
+        <ul class="tabs" id="main-nav">
+          <li><a href="#/generate" data-route="generate">Generate</a></li>
+          <li><a href="#/tutorial" data-route="tutorial">Tutorial</a></li>
+          <li><a href="#/formats" data-route="formats">Templates</a></li>
+          <li><a href="#/faq" data-route="faq">FAQ</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main" tabindex="-1">
+
+    <!-- ============================== GENERATE ============================== -->
+    <section class="view" id="view-generate" data-title="Generate a schedule" hidden>
+      <div class="wrap">
+        <div class="page-head">
+          <h1 tabindex="-1">Build a tabling schedule</h1>
+          <p class="lead">Upload your board's availability, pick how many people you need per shift, and download a ready-to-share Excel schedule.</p>
+          <p class="privacy">
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="10" width="16" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>
+            <span><strong>Private by design.</strong> Everything runs in your browser, and your files are never uploaded.</span>
+          </p>
+        </div>
+
+        <div class="engine" id="engine" role="status" aria-live="polite">
+          <span class="spinner" aria-hidden="true"></span>
+          <span class="engine-text" id="engine-text">Preparing the scheduler…</span>
+          <button type="button" class="btn btn-quiet" id="engine-retry" hidden>Try again</button>
+        </div>
+
+        <ol class="how" aria-label="How it works">
+          <li><span class="num" aria-hidden="true">1</span><span><strong>Upload</strong> the sign-up CSV</span></li>
+          <li><span class="num" aria-hidden="true">2</span><span><strong>Choose</strong> your settings</span></li>
+          <li><span class="num" aria-hidden="true">3</span><span><strong>Generate</strong> &amp; download</span></li>
+        </ol>
+        <p class="hint-line">First time here? <a href="#/tutorial">Follow the 5-minute tutorial</a> or try it instantly with the example data.</p>
+
+        <form id="form" novalidate>
+          <!-- Step 1 -->
+          <fieldset class="card step">
+            <legend><span class="num" aria-hidden="true">1</span> Upload your files</legend>
+
+            <div class="field">
+              <label for="file-availability">Sign-up responses <span class="req">Required</span></label>
+              <p class="help" id="help-availability">The CSV exported from your availability Google Form. <a href="#/formats">See the expected columns</a>.</p>
+              <div class="filebox" id="box-availability">
+                <input type="file" id="file-availability" accept=".csv,text/csv" aria-describedby="help-availability err-availability">
+                <div class="file-chip" id="chip-availability" hidden>
+                  <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/></svg>
+                  <span class="file-name"></span><span class="file-meta"></span>
+                  <button type="button" class="btn btn-quiet" data-clear="availability" aria-label="Remove sign-up responses file">Remove</button>
+                </div>
+              </div>
+              <p class="error" id="err-availability" role="alert" hidden></p>
+            </div>
+
+            <div class="field">
+              <label for="file-past">Past shifts <span class="opt">Optional</span></label>
+              <p class="help" id="help-past">Who has already tabled this semester. People with more past shifts are scheduled less so everyone ends up even. <a href="#/tutorial/step-3">How to make this file</a>.</p>
+              <div class="filebox" id="box-past">
+                <input type="file" id="file-past" accept=".csv,text/csv" aria-describedby="help-past err-past">
+                <div class="file-chip" id="chip-past" hidden>
+                  <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/></svg>
+                  <span class="file-name"></span><span class="file-meta"></span>
+                  <button type="button" class="btn btn-quiet" data-clear="past" aria-label="Remove past shifts file">Remove</button>
+                </div>
+              </div>
+              <p class="error" id="err-past" role="alert" hidden></p>
+            </div>
+
+            <div class="example-row">
+              <button type="button" class="btn btn-secondary" id="use-example">Use fictional example data</button>
+              <span class="help">Loads a made-up board of 50 people so you can see how everything works.</span>
+            </div>
+          </fieldset>
+
+          <!-- Step 2 -->
+          <fieldset class="card step">
+            <legend><span class="num" aria-hidden="true">2</span> Choose your settings</legend>
+
+            <div class="grid-2">
+              <div class="field">
+                <label for="start-date">First week</label>
+                <input type="date" id="start-date" required aria-describedby="help-start err-start">
+                <p class="help" id="help-start">Pick any day. The schedule starts on that week's Monday, and tabling happens Tuesday and Wednesday.</p>
+                <p class="error" id="err-start" role="alert" hidden></p>
+              </div>
+              <div class="field">
+                <label for="num-weeks">Number of weeks</label>
+                <div class="stepper" data-stepper>
+                  <button type="button" class="btn btn-icon" aria-label="Fewer weeks" data-step="-1">−</button>
+                  <input type="number" id="num-weeks" inputmode="numeric" min="1" max="40" value="4" aria-describedby="help-weeks err-weeks">
+                  <button type="button" class="btn btn-icon" aria-label="More weeks" data-step="1">+</button>
+                </div>
+                <p class="help" id="help-weeks">Weeks you want scheduled, not counting skipped weeks.</p>
+                <p class="error" id="err-weeks" role="alert" hidden></p>
+              </div>
+            </div>
+
+            <div class="field">
+              <span class="label" id="staff-label">People on each shift</span>
+              <p class="help" id="help-staff">There are 8 shifts a week: Tuesday and Wednesday, 11–12, 12–1, 1–2 and 2–3. Choose a preset or set the numbers yourself.</p>
+              <div class="presets" role="group" aria-label="Staffing presets" id="presets">
+                <button type="button" class="chip-btn" data-preset="1,1,1" aria-pressed="true">1 SBM · 1 BM · 1 On-Call</button>
+                <button type="button" class="chip-btn" data-preset="1,1,0" aria-pressed="false">1 SBM · 1 BM</button>
+                <button type="button" class="chip-btn" data-preset="1,2,0" aria-pressed="false">1 SBM · 2 BMs</button>
+                <button type="button" class="chip-btn" data-preset="2,2,0" aria-pressed="false">2 SBMs · 2 BMs</button>
+              </div>
+              <div class="grid-3" role="group" aria-labelledby="staff-label" aria-describedby="help-staff err-staff">
+                <div class="mini-field">
+                  <label for="n-seniors">Senior Board Members (SBMs)</label>
+                  <div class="stepper" data-stepper>
+                    <button type="button" class="btn btn-icon" aria-label="Fewer SBMs per shift" data-step="-1">−</button>
+                    <input type="number" id="n-seniors" inputmode="numeric" min="0" max="6" value="1">
+                    <button type="button" class="btn btn-icon" aria-label="More SBMs per shift" data-step="1">+</button>
+                  </div>
+                </div>
+                <div class="mini-field">
+                  <label for="n-board">Board Members (BMs)</label>
+                  <div class="stepper" data-stepper>
+                    <button type="button" class="btn btn-icon" aria-label="Fewer BMs per shift" data-step="-1">−</button>
+                    <input type="number" id="n-board" inputmode="numeric" min="0" max="6" value="1">
+                    <button type="button" class="btn btn-icon" aria-label="More BMs per shift" data-step="1">+</button>
+                  </div>
+                </div>
+                <div class="mini-field">
+                  <label for="n-oncall">On-Call BMs</label>
+                  <div class="stepper" data-stepper>
+                    <button type="button" class="btn btn-icon" aria-label="Fewer on-call BMs per shift" data-step="-1">−</button>
+                    <input type="number" id="n-oncall" inputmode="numeric" min="0" max="6" value="1">
+                    <button type="button" class="btn btn-icon" aria-label="More on-call BMs per shift" data-step="1">+</button>
+                  </div>
+                </div>
+              </div>
+              <p class="summary-line" id="staff-summary" aria-live="polite"></p>
+              <p class="error" id="err-staff" role="alert" hidden></p>
+            </div>
+
+            <div class="field">
+              <label for="skip-date">Skip weeks with no tabling <span class="opt">Optional</span></label>
+              <p class="help" id="help-skip">For breaks like Thanksgiving. Pick any date in that week and press Add. Skipped weeks keep their week number but get no shifts.</p>
+              <div class="inline-add">
+                <input type="date" id="skip-date" aria-describedby="help-skip err-skip">
+                <button type="button" class="btn btn-secondary" id="skip-add">Add week</button>
+              </div>
+              <ul class="chips" id="skip-list" aria-label="Skipped weeks"></ul>
+              <p class="error" id="err-skip" role="alert" hidden></p>
+            </div>
+          </fieldset>
+
+          <!-- Step 3 -->
+          <fieldset class="card step">
+            <legend><span class="num" aria-hidden="true">3</span> Generate</legend>
+            <div class="actions">
+              <button type="submit" class="btn btn-primary btn-lg" id="generate" disabled>
+                <span class="btn-label">Generate schedule</span>
+              </button>
+              <p class="help" id="generate-help">Upload the sign-up responses to continue.</p>
+            </div>
+          </fieldset>
+        </form>
+
+        <!-- Results -->
+        <section id="results" class="results" aria-labelledby="results-title" aria-live="polite" hidden>
+          <h2 id="results-title" tabindex="-1">Your schedule</h2>
+          <div class="banner" id="banner"></div>
+          <div id="warnings"></div>
+
+          <div class="result-actions">
+            <button type="button" class="btn btn-primary" id="download">
+              <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12"/><path d="m7 11 5 5 5-5"/><path d="M5 20h14"/></svg>
+              Download Excel (.xlsx)
+            </button>
+            <button type="button" class="btn btn-secondary" id="reshuffle">
+              <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/><path d="M3 21v-5h5"/></svg>
+              Shuffle again
+            </button>
+            <p class="help">Shuffle gives a different but equally fair schedule from the same settings.</p>
+          </div>
+
+          <div class="week-tabs" role="tablist" aria-label="Weeks" id="week-tabs"></div>
+          <div id="week-panel" role="tabpanel" tabindex="0"></div>
+          <p class="help" id="skipped-note"></p>
+
+          <details class="disclosure" id="people-details">
+            <summary>Shifts per person <span class="count" id="people-count"></span></summary>
+            <div class="disclosure-body">
+              <label for="people-filter" class="sr-only">Filter people by name</label>
+              <input type="search" id="people-filter" placeholder="Filter by name…" autocomplete="off">
+              <div class="table-scroll">
+                <table class="data" id="people-table">
+                  <thead><tr><th scope="col">Name</th><th scope="col">Role</th><th scope="col" class="num-col">Past</th><th scope="col" class="num-col">New</th><th scope="col" class="num-col">Total</th></tr></thead>
+                  <tbody></tbody>
+                </table>
+              </div>
+            </div>
+          </details>
+
+          <details class="disclosure">
+            <summary>Scheduler log</summary>
+            <div class="disclosure-body"><pre class="log" id="log" tabindex="0"></pre></div>
+          </details>
+        </section>
+      </div>
+    </section>
+
+    <!-- ============================== TUTORIAL ============================== -->
+    <section class="view" id="view-tutorial" data-title="Tutorial" hidden>
+      <div class="wrap">
+        <div class="page-head">
+          <h1 tabindex="-1">Tutorial</h1>
+          <p class="lead">From a Google Form to a finished Excel schedule in about five minutes. All names in the screenshots are fictional.</p>
+        </div>
+
+        <div class="doc-layout">
+          <nav class="toc" aria-label="Tutorial steps">
+            <p class="toc-title">On this page</p>
+            <ol>
+              <li><a href="#/tutorial/step-1">Collect availability</a></li>
+              <li><a href="#/tutorial/step-2">Export it as a CSV</a></li>
+              <li><a href="#/tutorial/step-3">Record past shifts</a></li>
+              <li><a href="#/tutorial/step-4">Upload &amp; choose settings</a></li>
+              <li><a href="#/tutorial/step-5">Generate &amp; check</a></li>
+              <li><a href="#/tutorial/step-6">Download &amp; share</a></li>
+              <li><a href="#/tutorial/tips">Tips for each week</a></li>
+            </ol>
+            <a class="btn btn-secondary btn-block" href="#/generate">Open the generator</a>
+          </nav>
+
+          <article class="doc">
+            <section id="step-1" class="doc-step">
+              <h2><span class="num" aria-hidden="true">1</span> Collect availability</h2>
+              <p>Use a Google Form to ask every board member the same questions. The scheduler needs these fields, and the question titles should match exactly:</p>
+              <ul class="checks">
+                <li><strong>Email Address</strong> (turn on <em>Collect email addresses</em> in the form settings)</li>
+                <li><strong>First Name</strong> and <strong>Last Name</strong></li>
+                <li><strong>Position</strong>, with the choices <code>Senior Board Member</code> and <code>Board Member</code></li>
+                <li><strong>Availability for Tuesdays (11am - 3pm)</strong> and <strong>Availability for Wednesdays (11am - 3pm)</strong> as checkboxes, with the choices <code>11-12</code>, <code>12-1</code>, <code>1-2</code>, <code>2-3</code></li>
+              </ul>
+              <p>When someone submits twice, the tool keeps their most recent response.</p>
+              <figure>
+                <img src="img/tut-responses.png" width="2182" height="640" loading="lazy" alt="A spreadsheet of form responses with columns for timestamp, email, first name, last name, Tuesday availability, Wednesday availability and position.">
+                <figcaption>What your Form Responses sheet should look like. Each person's availability is a comma-separated list of time slots.</figcaption>
+              </figure>
+            </section>
+
+            <section id="step-2" class="doc-step">
+              <h2><span class="num" aria-hidden="true">2</span> Export it as a CSV</h2>
+              <ol class="steps-list">
+                <li>Open the linked <strong>Form Responses</strong> sheet in Google Sheets.</li>
+                <li>Choose <strong>File → Download → Comma-separated values (.csv)</strong>.</li>
+                <li>Keep the file somewhere you can find it. You'll upload it in step 4.</li>
+              </ol>
+              <p class="callout tip"><strong>Tip.</strong> You don't need to edit the CSV. Extra columns are ignored and duplicate sign-ups are handled for you.</p>
+            </section>
+
+            <section id="step-3" class="doc-step">
+              <h2><span class="num" aria-hidden="true">3</span> Record past shifts <span class="opt">Optional, but recommended mid-semester</span></h2>
+              <p>If you've already tabled for a few weeks, tell the tool who worked so it can even things out. Count how many shifts each person has worked in your earlier weekly sheets, then write them in a two-column CSV.</p>
+              <figure>
+                <img src="img/tut-old-schedule.png" width="2396" height="364" loading="lazy" alt="Two earlier weekly schedules shown side by side, with names highlighted where the same person appears in both weeks.">
+                <figcaption>Count each person across your earlier weeks. Here Emery Novak and Hollis Eastwood each appear twice.</figcaption>
+              </figure>
+              <figure>
+                <img class="narrow-img" src="img/tut-past-shifts.png" width="544" height="668" loading="lazy" alt="A two-column spreadsheet with a Name column and a Shifts column listing example people and their shift counts.">
+                <figcaption>The past shifts file: <code>Name</code> and <code>Shifts</code>. Only list people who've worked at least once.</figcaption>
+              </figure>
+              <p class="callout warn"><strong>Spell names the way they appear in the sign-up form</strong> (first name, a space, last name). If a name doesn't match, the tool tells you which ones it skipped. You can fix them and run it again.</p>
+              <p><a href="examples/example_past_shifts.csv" download>Download the example past shifts file</a> to copy the format.</p>
+            </section>
+
+            <section id="step-4" class="doc-step">
+              <h2><span class="num" aria-hidden="true">4</span> Upload &amp; choose settings</h2>
+              <p>Open the <a href="#/generate">Generate</a> tab. Choose your sign-up CSV, add the past shifts file if you have one, then set the schedule.</p>
+              <figure>
+                <img src="img/tut-upload.png" width="2096" height="898" loading="lazy" alt="The generator's upload step with a sign-up responses file and a past shifts file both loaded and shown as file chips.">
+                <figcaption>Both files loaded. The Generate button unlocks as soon as the sign-up file is in.</figcaption>
+              </figure>
+              <figure>
+                <img src="img/tut-settings.png" width="2096" height="1322" loading="lazy" alt="The generator's settings step showing the first week date, number of weeks, staffing presets and a skipped Thanksgiving week.">
+                <figcaption>Settings: first week, number of weeks, who's on each shift, and any weeks to skip.</figcaption>
+              </figure>
+              <dl class="defs">
+                <dt>First week</dt><dd>Any date in the week you want to start. The schedule uses that week's Monday.</dd>
+                <dt>People on each shift</dt><dd>Use a preset or set the numbers. <strong>SBMs</strong> are picked only from Senior Board Members. <strong>BMs</strong> and <strong>On-Call</strong> are picked only from Board Members. The on-call person is who the table covers if someone can't make it.</dd>
+                <dt>Skip weeks</dt><dd>Add any date in a week with no tabling. That week is left out and doesn't count toward your number of weeks.</dd>
+              </dl>
+            </section>
+
+            <section id="step-5" class="doc-step">
+              <h2><span class="num" aria-hidden="true">5</span> Generate &amp; check</h2>
+              <p>Press <strong>Generate schedule</strong>. In a few seconds you'll see a preview that matches the Excel layout, with one tab per week.</p>
+              <figure>
+                <img src="img/tut-results.png" width="2112" height="964" loading="lazy" alt="The schedule preview for week 1 showing Tuesday and Wednesday columns with four time slots each and rows for senior board member, board member and on-call.">
+                <figcaption>The preview for one week. Switch weeks with the tabs above the table.</figcaption>
+              </figure>
+              <ul class="checks">
+                <li>A green banner means every spot is filled. An amber banner lists how many are <strong>Unfilled</strong>, usually because nobody eligible was free.</li>
+                <li>Open <strong>Shifts per person</strong> to confirm the load is even and see who isn't scheduled yet.</li>
+                <li>Not happy with the result? Press <strong>Shuffle again</strong> for another fair schedule.</li>
+              </ul>
+              <figure>
+                <img src="img/tut-people.png" width="2096" height="1146" loading="lazy" alt="The shifts per person table listing each person's role and how many past, new and total shifts they have.">
+                <figcaption>The shift count table lets you check fairness at a glance.</figcaption>
+              </figure>
+            </section>
+
+            <section id="step-6" class="doc-step">
+              <h2><span class="num" aria-hidden="true">6</span> Download &amp; share</h2>
+              <p>Press <strong>Download Excel (.xlsx)</strong>. The workbook has one sheet per week using the UMSBC template, including the reminder notes at the bottom. Open it in Excel or upload it to Google Drive to share with the board.</p>
+              <p class="callout tip"><strong>Keep your records.</strong> After the weeks go by, add the new shifts to your past shifts file so next time starts from an accurate count.</p>
+            </section>
+
+            <section id="tips" class="doc-step">
+              <h2>Tips for each week</h2>
+              <ul class="checks">
+                <li><strong>Nobody works two weeks in a row.</strong> A skipped break week counts as a gap, so someone can work the week before and after it.</li>
+                <li><strong>Fewer people than spots?</strong> Lower the people per shift, or ask more people to submit availability.</li>
+                <li><strong>Something changed mid-semester?</strong> Update the CSV (or past shifts) and generate again.</li>
+              </ul>
+            </section>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================== FORMATS ============================== -->
+    <section class="view" id="view-formats" data-title="Templates and formats" hidden>
+      <div class="wrap">
+        <div class="page-head">
+          <h1 tabindex="-1">Templates &amp; formats</h1>
+          <p class="lead">Everything the tool reads and writes, with files you can download and copy.</p>
+        </div>
+
+        <div class="cards-3">
+          <a class="dl-card" href="examples/example_availability.csv" download>
+            <span class="dl-title">Example sign-up CSV</span>
+            <span class="dl-desc">50 fictional people in the exact format the tool expects.</span>
+            <span class="dl-cta">Download .csv</span>
+          </a>
+          <a class="dl-card" href="examples/example_past_shifts.csv" download>
+            <span class="dl-title">Example past shifts CSV</span>
+            <span class="dl-desc">Name and shift count for people who already tabled.</span>
+            <span class="dl-cta">Download .csv</span>
+          </a>
+          <a class="dl-card" href="template/weekly_tabling_schedule_template.xlsx" download>
+            <span class="dl-title">Weekly Excel template</span>
+            <span class="dl-desc">The sheet the schedule is filled into, one copy per week.</span>
+            <span class="dl-cta">Download .xlsx</span>
+          </a>
+        </div>
+
+        <section class="block">
+          <h2>Sign-up CSV</h2>
+          <p>One row per person. Column titles must match exactly (capitalization and spacing count).</p>
+          <div class="table-scroll">
+            <table class="data">
+              <thead><tr><th scope="col">Column</th><th scope="col">What goes in it</th><th scope="col">Example</th></tr></thead>
+              <tbody>
+                <tr><th scope="row"><code>Timestamp</code></th><td>When they submitted. Optional, but used to keep the newest response when someone signs up twice.</td><td>9/3/2026 10:47:00</td></tr>
+                <tr><th scope="row"><code>Email Address</code></th><td>Unique for each person. The tool uses it to tell people apart.</td><td>avery.brooks@example.edu</td></tr>
+                <tr><th scope="row"><code>First Name</code></th><td>First name.</td><td>Avery</td></tr>
+                <tr><th scope="row"><code>Last Name</code></th><td>Last name.</td><td>Brooks</td></tr>
+                <tr><th scope="row"><code>Position</code></th><td>Exactly <code>Senior Board Member</code> or <code>Board Member</code>. Anyone else is ignored.</td><td>Senior Board Member</td></tr>
+                <tr><th scope="row"><code>Availability for Tuesdays (11am - 3pm)</code></th><td>Comma-separated slots from <code>11-12</code>, <code>12-1</code>, <code>1-2</code>, <code>2-3</code>. Leave blank if unavailable.</td><td>11-12, 12-1, 2-3</td></tr>
+                <tr><th scope="row"><code>Availability for Wednesdays (11am - 3pm)</code></th><td>Same format as Tuesday.</td><td>1-2, 2-3</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <figure>
+            <img src="img/tut-responses.png" width="2182" height="640" loading="lazy" alt="Example sign-up responses spreadsheet.">
+            <figcaption>Example sign-up responses (fictional people).</figcaption>
+          </figure>
+        </section>
+
+        <section class="block">
+          <h2>Past shifts CSV</h2>
+          <p>Two columns, one row per person who has already tabled.</p>
+          <div class="table-scroll">
+            <table class="data">
+              <thead><tr><th scope="col">Column</th><th scope="col">What goes in it</th><th scope="col">Example</th></tr></thead>
+              <tbody>
+                <tr><th scope="row"><code>Name</code></th><td>First and last name, spelled as in the sign-up form. Capitalization doesn't matter.</td><td>Quinn Abbott</td></tr>
+                <tr><th scope="row"><code>Shifts</code></th><td>Whole number of shifts already worked.</td><td>2</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <section class="block">
+          <h2>Excel output</h2>
+          <p>The download is an <code>.xlsx</code> workbook with a sheet for every scheduled week (<em>Week 1</em>, <em>Week 3</em>, …). Each sheet has a Tuesday and Wednesday block, four hour-long slots each, and a row for every person needed. Empty spots show <strong>UNASSIGNED</strong>.</p>
+          <figure>
+            <img src="img/tut-results.png" width="2112" height="964" loading="lazy" alt="Preview of one week's schedule, matching the layout of the Excel sheet.">
+            <figcaption>The on-screen preview mirrors the layout of each Excel sheet.</figcaption>
+          </figure>
+        </section>
+      </div>
+    </section>
+
+    <!-- ============================== FAQ ============================== -->
+    <section class="view" id="view-faq" data-title="FAQ" hidden>
+      <div class="wrap narrow">
+        <div class="page-head">
+          <h1 tabindex="-1">Frequently asked questions</h1>
+        </div>
+
+        <details class="faq">
+          <summary>Is my board's information uploaded anywhere?</summary>
+          <p>No. The scheduler runs inside your browser tab. Your CSV files are read on your computer and the schedule is built there. Nothing is sent to a server. Closing the tab clears everything.</p>
+        </details>
+        <details class="faq">
+          <summary>How does it decide who works?</summary>
+          <p>For each shift, it considers only people who said they're free for that slot, who didn't work last week, and who aren't already working this week. Among those, it favors whoever has the fewest shifts so far (counting past shifts). Board Members are chosen at random from the three people with the lightest load, so results vary a little each time.</p>
+        </details>
+        <details class="faq">
+          <summary>Why are some shifts marked Unfilled?</summary>
+          <p>It means nobody eligible was left for that spot. Common causes: too few people free at that time, everyone already working that week, or not enough SBMs. Try fewer people per shift, shuffle again, or ask for more availability.</p>
+        </details>
+        <details class="faq">
+          <summary>Why is someone never scheduled?</summary>
+          <p>Each person works at most once a week, and people with fewer shifts go first. With many board members and few spots per week, some people simply aren't reached yet. Check <strong>Shifts per person</strong> and add more weeks, more people per shift, or past shifts to even things out over time.</p>
+        </details>
+        <details class="faq">
+          <summary>What's the difference between a BM and an On-Call BM?</summary>
+          <p>A BM staffs the table. The on-call BM isn't at the table but is the person to contact if someone can't make their shift. Set On-Call to 0 if you don't use that role.</p>
+        </details>
+        <details class="faq">
+          <summary>My past shifts file says some names didn't match.</summary>
+          <p>Names must match the sign-up form (first and last name). Open the <strong>Scheduler log</strong> in the results to see exactly which names were skipped, fix their spelling in the CSV, and generate again.</p>
+        </details>
+        <details class="faq">
+          <summary>How do I schedule around a break week?</summary>
+          <p>Add any date from that week under <strong>Skip weeks with no tabling</strong>. The week gets no shifts and isn't counted toward your number of weeks.</p>
+        </details>
+        <details class="faq">
+          <summary>The page says it can't load the scheduler.</summary>
+          <p>The first visit downloads Python and a few data libraries (about 30 MB), so you need an internet connection. Press <strong>Try again</strong>. After the first load, your browser keeps most of it for next time.</p>
+        </details>
+        <details class="faq">
+          <summary>Is there a desktop version?</summary>
+          <p>Yes. A Windows app is available in the <a href="https://github.com/nware49/umsbc-tabling-scheduler/tree/main/dist" rel="noopener">project's dist folder</a>, and the full source code is in the <a href="https://github.com/nware49/umsbc-tabling-scheduler" rel="noopener">GitHub repository</a>.</p>
+        </details>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap">
+      <p>UMSBC Tabling Scheduler · <a href="https://github.com/nware49/umsbc-tabling-scheduler" rel="noopener">Source on GitHub</a></p>
+    </div>
+  </footer>
+
+  <script src="app.js" defer></script>
+</body>
+</html>

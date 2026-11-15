@@ -39,3 +39,10 @@ You could also try sending an email reminder to the people who are scheduled for
 - [ ] Do you need phone numbers so people can text each other to cover shifts?
 - [ ] World domination
 - [ ] Skiing through the Student Union
+## Website
+
+A browser version lives in `docs/` and is published with GitHub Pages (Settings → Pages → Deploy from branch → `main` / `docs`). It runs the same `autoScheduler.py` in the browser with Pyodide, so uploaded files never leave the user's computer.
+
+- After changing `autoScheduler.py` or the Excel template, run `python scripts/sync_site.py` and commit `docs/`.
+- The example files and tutorial screenshots use fictional people (`scripts/make_example_data.py`).
+- To preview locally: `cd docs && python -m http.server 8000`, then open http://localhost:8000.

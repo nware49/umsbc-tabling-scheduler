@@ -1,0 +1,51 @@
+Timestamp,Email Address,First Name,Last Name,Availability for Tuesdays (11am - 3pm),Availability for Wednesdays (11am - 3pm),Position
+9/1/2026 10:37:00,avery.brooks@example.edu,Avery,Brooks,"11-12, 12-1, 1-2, 2-3","11-12, 12-1, 1-2, 2-3",Senior Board Member
+9/1/2026 18:47:00,jordan.ellis@example.edu,Jordan,Ellis,"11-12, 12-1, 1-2, 2-3","11-12, 1-2, 2-3",Senior Board Member
+9/3/2026 10:47:00,morgan.reyes@example.edu,Morgan,Reyes,"11-12, 1-2","11-12, 12-1, 1-2, 2-3",Senior Board Member
+9/6/2026 16:47:00,riley.okafor@example.edu,Riley,Okafor,"11-12, 12-1, 1-2, 2-3","11-12, 12-1, 1-2, 2-3",Senior Board Member
+9/6/2026 20:38:00,casey.lindgren@example.edu,Casey,Lindgren,"12-1, 1-2, 2-3","12-1, 1-2, 2-3",Senior Board Member
+9/2/2026 17:46:00,taylor.nakamura@example.edu,Taylor,Nakamura,"11-12, 1-2, 2-3","12-1, 1-2, 2-3",Senior Board Member
+9/5/2026 16:54:00,quinn.abbott@example.edu,Quinn,Abbott,"1-2, 2-3","11-12, 1-2, 2-3",Senior Board Member
+9/6/2026 9:39:00,rowan.castillo@example.edu,Rowan,Castillo,"11-12, 12-1, 1-2, 2-3","1-2, 2-3",Senior Board Member
+9/8/2026 10:20:00,sage.whitfield@example.edu,Sage,Whitfield,"11-12, 12-1, 1-2, 2-3","11-12, 12-1, 1-2",Senior Board Member
+9/7/2026 12:19:00,emery.novak@example.edu,Emery,Novak,"11-12, 12-1","12-1, 1-2, 2-3",Senior Board Member
+9/6/2026 18:46:00,harper.delgado@example.edu,Harper,Delgado,"11-12, 12-1, 1-2, 2-3","12-1, 1-2, 2-3",Senior Board Member
+9/7/2026 15:35:00,finley.marsh@example.edu,Finley,Marsh,"11-12, 12-1","11-12, 12-1, 1-2",Senior Board Member
+9/2/2026 9:46:00,dakota.pruitt@example.edu,Dakota,Pruitt,"11-12, 12-1, 1-2, 2-3","12-1, 1-2, 2-3",Senior Board Member
+9/6/2026 18:33:00,skyler.banerjee@example.edu,Skyler,Banerjee,"11-12, 12-1, 1-2, 2-3","12-1, 1-2, 2-3",Senior Board Member
+9/5/2026 16:54:00,reese.calloway@example.edu,Reese,Calloway,"11-12, 12-1, 1-2","11-12, 12-1, 1-2, 2-3",Senior Board Member
+9/2/2026 20:26:00,jamie.hollis@example.edu,Jamie,Hollis,"11-12, 12-1, 2-3","11-12, 12-1, 1-2, 2-3",Senior Board Member
+9/4/2026 12:35:00,parker.voss@example.edu,Parker,Voss,"11-12, 1-2, 2-3","11-12, 12-1, 1-2, 2-3",Senior Board Member
+9/6/2026 16:56:00,devon.achterberg@example.edu,Devon,Achterberg,"11-12, 12-1, 1-2, 2-3","11-12, 12-1, 1-2, 2-3",Senior Board Member
+9/1/2026 16:51:00,kendall.ortiz@example.edu,Kendall,Ortiz,"1-2, 2-3","11-12, 12-1, 1-2, 2-3",Senior Board Member
+9/7/2026 19:31:00,lane.fitzgerald@example.edu,Lane,Fitzgerald,"11-12, 12-1, 2-3","11-12, 12-1, 1-2",Senior Board Member
+9/1/2026 11:47:00,blake.sorensen@example.edu,Blake,Sorensen,"11-12, 1-2, 2-3","11-12, 12-1, 1-2",Board Member
+9/3/2026 9:10:00,remy.tanaka@example.edu,Remy,Tanaka,1-2,"12-1, 1-2, 2-3",Board Member
+9/1/2026 13:23:00,ellis.quigley@example.edu,Ellis,Quigley,"12-1, 1-2, 2-3","11-12, 1-2",Board Member
+9/8/2026 19:47:00,arden.pillai@example.edu,Arden,Pillai,"11-12, 12-1, 1-2, 2-3","11-12, 12-1, 2-3",Board Member
+9/3/2026 18:10:00,sloane.ashworth@example.edu,Sloane,Ashworth,12-1,"11-12, 12-1, 1-2",Board Member
+9/8/2026 10:45:00,marlow.bellamy@example.edu,Marlow,Bellamy,"12-1, 1-2, 2-3","11-12, 12-1, 1-2, 2-3",Board Member
+9/6/2026 18:42:00,tatum.cardenas@example.edu,Tatum,Cardenas,"11-12, 12-1, 1-2, 2-3","11-12, 12-1, 2-3",Board Member
+9/5/2026 17:22:00,wren.dunmore@example.edu,Wren,Dunmore,"11-12, 12-1, 1-2, 2-3","12-1, 1-2, 2-3",Board Member
+9/2/2026 11:55:00,hollis.eastwood@example.edu,Hollis,Eastwood,"12-1, 1-2, 2-3","11-12, 12-1, 1-2, 2-3",Board Member
+9/3/2026 19:24:00,kit.farrow@example.edu,Kit,Farrow,"11-12, 12-1, 1-2, 2-3","11-12, 12-1, 1-2",Board Member
+9/8/2026 16:55:00,lennox.galloway@example.edu,Lennox,Galloway,"11-12, 12-1, 1-2, 2-3","11-12, 12-1, 1-2, 2-3",Board Member
+9/2/2026 10:26:00,sutton.hartigan@example.edu,Sutton,Hartigan,"11-12, 12-1, 1-2, 2-3",11-12,Board Member
+9/7/2026 11:44:00,rory.iyer@example.edu,Rory,Iyer,"11-12, 1-2",1-2,Board Member
+9/1/2026 19:15:00,briar.jessup@example.edu,Briar,Jessup,"12-1, 1-2, 2-3","11-12, 12-1, 1-2, 2-3",Board Member
+9/5/2026 18:18:00,cove.kowalczyk@example.edu,Cove,Kowalczyk,"12-1, 2-3","12-1, 1-2, 2-3",Board Member
+9/4/2026 13:38:00,drew.lockhart@example.edu,Drew,Lockhart,"11-12, 12-1","11-12, 12-1, 2-3",Board Member
+9/4/2026 17:40:00,ember.mbeki@example.edu,Ember,Mbeki,"11-12, 12-1, 1-2, 2-3","11-12, 12-1, 1-2, 2-3",Board Member
+9/5/2026 20:23:00,frankie.navarro@example.edu,Frankie,Navarro,"11-12, 12-1, 1-2, 2-3","11-12, 12-1",Board Member
+9/3/2026 9:14:00,gray.oyelaran@example.edu,Gray,Oyelaran,"12-1, 2-3","11-12, 12-1, 1-2, 2-3",Board Member
+9/4/2026 20:28:00,hayden.prescott@example.edu,Hayden,Prescott,"11-12, 1-2, 2-3","11-12, 12-1, 1-2",Board Member
+9/1/2026 13:23:00,indy.rasmussen@example.edu,Indy,Rasmussen,"11-12, 12-1, 1-2, 2-3","11-12, 12-1, 2-3",Board Member
+9/5/2026 10:19:00,jules.salazar@example.edu,Jules,Salazar,"11-12, 12-1, 1-2, 2-3","11-12, 12-1, 1-2, 2-3",Board Member
+9/7/2026 14:56:00,kai.thackeray@example.edu,Kai,Thackeray,"11-12, 12-1, 1-2, 2-3","11-12, 12-1, 1-2",Board Member
+9/3/2026 17:58:00,lior.underhill@example.edu,Lior,Underhill,"12-1, 1-2, 2-3","11-12, 2-3",Board Member
+9/4/2026 10:11:00,micah.valdez@example.edu,Micah,Valdez,11-12,"11-12, 1-2, 2-3",Board Member
+9/4/2026 16:26:00,nico.whitlock@example.edu,Nico,Whitlock,"11-12, 12-1, 2-3","11-12, 12-1, 1-2, 2-3",Board Member
+9/5/2026 10:26:00,oakley.xu@example.edu,Oakley,Xu,"11-12, 1-2, 2-3","11-12, 12-1, 1-2, 2-3",Board Member
+9/5/2026 9:49:00,peyton.yoon@example.edu,Peyton,Yoon,"11-12, 1-2, 2-3","11-12, 1-2",Board Member
+9/8/2026 9:41:00,river.zielinski@example.edu,River,Zielinski,"11-12, 12-1, 1-2, 2-3","11-12, 12-1, 1-2, 2-3",Board Member
+9/2/2026 17:22:00,shiloh.arcand@example.edu,Shiloh,Arcand,"11-12, 12-1, 1-2, 2-3","11-12, 12-1, 1-2, 2-3",Board Member

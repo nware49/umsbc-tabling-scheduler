@@ -1,1 +1,9 @@
 /build
+
+# Real member data and generated schedules: never commit
+past_shifts.csv
+Tabling availability*.csv
+*.pdf
+dist/*.xlsx
+dist/~$*
+__pycache__/
