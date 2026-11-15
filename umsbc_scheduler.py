@@ -31,6 +31,7 @@ class SchedulerApp:
             print(f"⚠️ Could not load icon: {e}")
 
         self.csv_file = None
+        self.past_shifts_file = "past_shifts.csv" if os.path.exists("past_shifts.csv") else None
         self.last_start_date = None
         self.last_num_weeks = None
         self.last_output_file = None
@@ -46,6 +47,12 @@ class SchedulerApp:
         self.file_button = tk.Button(top_frame, text="Browse...", command=self.browse_file)
         self.file_button.pack(side=tk.LEFT, padx=5)
 
+        past_frame = tk.Frame(root, bg="#2068C8")
+        past_frame.pack(pady=5)
+        tk.Label(past_frame, text="Past Shifts CSV (optional):", bg="#2068C8", fg="white").pack(side=tk.LEFT, padx=5)
+        self.past_button = tk.Button(past_frame, text="Browse...", command=self.browse_past_shifts)
+        self.past_button.pack(side=tk.LEFT, padx=5)
+
         # --- Inputs ---
         input_frame = tk.Frame(root, bg="#2068C8")
         input_frame.pack(pady=10)
@@ -58,6 +65,19 @@ class SchedulerApp:
         self.weeks_entry = tk.Entry(input_frame, width=5)
         self.weeks_entry.insert(0, "16")
         self.weeks_entry.pack(side=tk.LEFT, padx=5)
+
+        # --- People per shift ---
+        staff_frame = tk.Frame(root, bg="#2068C8")
+        staff_frame.pack(pady=5)
+        self.staff_entries = {}
+        for key, label, default in (("seniors", "SBMs per shift:", "1"),
+                                    ("board", "BMs per shift:", "1"),
+                                    ("oncall", "On-Call BMs per shift:", "1")):
+            tk.Label(staff_frame, text=label, bg="#2068C8", fg="white").pack(side=tk.LEFT, padx=5)
+            entry = tk.Entry(staff_frame, width=4)
+            entry.insert(0, default)
+            entry.pack(side=tk.LEFT, padx=5)
+            self.staff_entries[key] = entry
 
         # --- Buttons ---
         button_frame = tk.Frame(root, bg="#2068C8")
@@ -96,6 +116,38 @@ class SchedulerApp:
             self.csv_file = file_path
             print(f"✅ Loaded file: {os.path.basename(file_path)}\n")
 
+    def browse_past_shifts(self):
+        file_path = filedialog.askopenfilename(
+            title="Select Past Shifts CSV",
+            filetypes=(("CSV files", "*.csv"), ("All files", "*.*"))
+        )
+        if file_path:
+            self.past_shifts_file = file_path
+            print(f"✅ Loaded past shifts: {os.path.basename(file_path)}\n")
+
+    def _read_staffing(self):
+        """Read people-per-shift inputs; returns None (after printing an error) if invalid"""
+        try:
+            counts = {key: int(entry.get()) for key, entry in self.staff_entries.items()}
+        except ValueError:
+            print("❌ Error: People per shift must be whole numbers.\n")
+            return None
+        if any(n < 0 for n in counts.values()) or sum(counts.values()) == 0:
+            print("❌ Error: People per shift can't be negative, and at least one is required.\n")
+            return None
+        return counts
+
+    def _build_scheduler(self):
+        staffing = self._read_staffing()
+        if staffing is None:
+            return None
+        scheduler = TablingScheduler(num_seniors=staffing["seniors"], num_board=staffing["board"],
+                                     num_oncall=staffing["oncall"])
+        scheduler.load_data(self.csv_file)
+        if self.past_shifts_file:
+            scheduler.load_past_shifts(self.past_shifts_file)
+        return scheduler
+
     def generate_schedule(self):
         if not self.csv_file:
             print("❌ Error: Please select a CSV file first.\n")
@@ -108,8 +160,9 @@ class SchedulerApp:
             print("❌ Error: Number of weeks must be an integer.\n")
             return
 
-        scheduler = TablingScheduler()
-        scheduler.load_data(self.csv_file)
+        scheduler = self._build_scheduler()
+        if scheduler is None:
+            return
         scheduler.generate_schedule(start_date, num_weeks=num_weeks)
 
         output_file = f"tabling_schedule_{start_date.replace('-', '_')}.xlsx"
@@ -127,8 +180,9 @@ class SchedulerApp:
             print("❌ Error: No previous schedule to regenerate.\n")
             return
 
-        scheduler = TablingScheduler()
-        scheduler.load_data(self.csv_file)
+        scheduler = self._build_scheduler()
+        if scheduler is None:
+            return
         scheduler.generate_schedule(self.last_start_date, num_weeks=self.last_num_weeks)
 
         output_file = self.last_output_file
