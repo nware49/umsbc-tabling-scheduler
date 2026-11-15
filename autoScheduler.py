@@ -186,10 +186,19 @@ class TablingScheduler:
         top_candidates = scored_members[:min(3, len(scored_members))]
         return random.choice(top_candidates)[0]
 
-    def generate_schedule(self, start_date_str, num_weeks=16):
-        """Generate schedule ensuring Senior Members only do Senior shifts"""
+    def generate_schedule(self, start_date_str, num_weeks=16, skip_weeks=()):
+        """Generate schedule ensuring Senior Members only do Senior shifts.
+        skip_weeks: dates (YYYY-MM-DD) falling in weeks with no tabling, e.g. a break.
+        Skipped weeks keep their week number but get no shifts, and don't count toward num_weeks."""
         start_date = datetime.strptime(start_date_str, '%Y-%m-%d')
+        skipped = set()
+        for date_str in skip_weeks:
+            day = datetime.strptime(date_str, '%Y-%m-%d')
+            skipped.add(day - timedelta(days=day.weekday()))  # Monday of that week
+
         weeks = self._get_week_dates(start_date, num_weeks)
+        while len([w for w in weeks if w not in skipped]) < num_weeks:
+            weeks.append(weeks[-1] + timedelta(weeks=1))
 
         print(f"\nGenerating {num_weeks}-week schedule starting {start_date_str}")
         print("=" * 50)
@@ -197,6 +206,9 @@ class TablingScheduler:
         unassigned_shifts = []
 
         for week_num, week_start in enumerate(weeks):
+            if week_start in skipped:
+                print(f"\nWeek {week_num + 1} (starting {week_start.strftime('%Y-%m-%d')}): skipped")
+                continue
             print(f"\nWeek {week_num + 1} (starting {week_start.strftime('%Y-%m-%d')}):")
 
             for day in self.days:
