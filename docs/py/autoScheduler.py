@@ -316,6 +316,40 @@ class TablingScheduler:
         df.to_csv(filename, index=False)
         print(f"\nSchedule exported to: {filename}")
 
+    # Written so Google Sheets won't mistake them for dates when the CSV is imported
+    SLOT_LABELS = {
+        '11-12': '11:00 AM to 12:00 PM',
+        '12-1': '12:00 PM to 1:00 PM',
+        '1-2': '1:00 PM to 2:00 PM',
+        '2-3': '2:00 PM to 3:00 PM',
+    }
+    ROLE_LABELS = {'Senior': 'Senior Board Member', 'Board': 'Board Member', 'OnCall': 'On-Call'}
+
+    def reminder_rows(self):
+        """One row per person per shift, for the reminder-email Google Sheet."""
+        rows = []
+        for (week_num, day, time_slot), assignment in sorted(
+                self.schedule.items(), key=lambda item: (item[0][0], self.days.index(item[0][1]),
+                                                         self.time_slots.index(item[0][2]))):
+            for role in ('Senior', 'Board', 'OnCall'):
+                for member in assignment[role]:
+                    rows.append({
+                        'Week': week_num + 1,
+                        'Date': assignment['date'].strftime('%Y-%m-%d'),
+                        'Day': day,
+                        'Time': self.SLOT_LABELS[time_slot],
+                        'Role': self.ROLE_LABELS[role],
+                        'First Name': member['first_name'],
+                        'Last Name': member['last_name'],
+                        'Email': member['email'],
+                    })
+        return rows
+
+    def export_reminders_csv(self, filename):
+        """Export the Reminders sheet used by the reminder-email Apps Script"""
+        pd.DataFrame(self.reminder_rows()).to_csv(filename, index=False)
+        print(f"Reminder sheet exported to: {filename}")
+
     def export_weekly_excel(self, template_file, output_file):
         """Export schedule to Excel using the template, one sheet per week.
         Preserves row/column spacing and formatting."""

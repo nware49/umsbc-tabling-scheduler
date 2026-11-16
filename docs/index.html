@@ -26,6 +26,7 @@
         <ul class="tabs" id="main-nav">
           <li><a href="#/generate" data-route="generate">Generate</a></li>
           <li><a href="#/tutorial" data-route="tutorial">Tutorial</a></li>
+          <li><a href="#/reminders" data-route="reminders">Reminders</a></li>
           <li><a href="#/formats" data-route="formats">Templates</a></li>
           <li><a href="#/faq" data-route="faq">FAQ</a></li>
         </ul>
@@ -203,6 +204,14 @@
             <p class="help">Shuffle gives a different but equally fair schedule from the same settings.</p>
           </div>
 
+          <div class="callout tip reminders-cta" id="reminders-cta">
+            <div>
+              <strong>Want everyone reminded automatically?</strong>
+              <p class="help">Download the Reminders sheet, then follow the <a href="#/reminders">reminder email setup</a>. People get an email on Sunday night and the morning of their shift, each with a calendar invite. The file contains email addresses, so keep it private.</p>
+            </div>
+            <button type="button" class="btn btn-secondary" id="download-reminders">Download Reminders CSV</button>
+          </div>
+
           <div class="week-tabs" role="tablist" aria-label="Weeks" id="week-tabs"></div>
           <div id="week-panel" role="tabpanel" tabindex="0"></div>
           <p class="help" id="skipped-note"></p>
@@ -343,6 +352,153 @@
                 <li><strong>Fewer people than spots?</strong> Lower the people per shift, or ask more people to submit availability.</li>
                 <li><strong>Something changed mid-semester?</strong> Update the CSV (or past shifts) and generate again.</li>
               </ul>
+            </section>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================== REMINDERS ============================== -->
+    <section class="view" id="view-reminders" data-title="Reminder emails" hidden>
+      <div class="wrap">
+        <div class="page-head">
+          <h1 tabindex="-1">Reminder emails</h1>
+          <p class="lead">Email everyone on the schedule on Sunday night and again the morning of their shift, each with a calendar invite attached. It runs from your own Google account and takes about 10 minutes to set up once.</p>
+        </div>
+
+        <div class="doc-layout">
+          <nav class="toc" aria-label="Reminder setup steps">
+            <p class="toc-title">On this page</p>
+            <ol>
+              <li class="nonum"><a href="#/reminders/what">What gets sent</a></li>
+              <li><a href="#/reminders/r-step-1">Get the Reminders sheet</a></li>
+              <li><a href="#/reminders/r-step-2">Import it into Google Sheets</a></li>
+              <li><a href="#/reminders/r-step-3">Add the script</a></li>
+              <li><a href="#/reminders/r-step-4">Send yourself a test</a></li>
+              <li><a href="#/reminders/r-step-5">Turn it on</a></li>
+              <li class="nonum"><a href="#/reminders/r-more">Settings &amp; troubleshooting</a></li>
+            </ol>
+            <a class="btn btn-secondary btn-block" href="#/generate">Open the generator</a>
+          </nav>
+
+          <article class="doc">
+            <section id="what" class="doc-step">
+              <h2>What gets sent</h2>
+              <p>Two emails per person, only to people who have a shift. Each one attaches a <code>.ics</code> calendar invite (it opens in Google Calendar, Outlook and Apple Calendar) with a one-hour-before alert.</p>
+              <div class="emails">
+                <figure class="email" aria-label="Example Sunday email">
+                  <figcaption class="email-bar"><strong>Sunday, 8:00 PM</strong><span>Your tabling shift this week: Tuesday, Nov 17</span></figcaption>
+                  <div class="email-body">
+                    <p>Hi Avery,</p>
+                    <p>Here is your tabling shift for this week:</p>
+                    <ul><li><strong>Tuesday, Nov 17: 11:00 AM to 12:00 PM (Senior Board Member)</strong></li></ul>
+                    <p>Who else is on your shift:</p>
+                    <ul><li>Tuesday: Blake Sorensen (Board Member), Kit Farrow (On-Call)</li></ul>
+                    <p>Reminders:</p>
+                    <ul><li>Show up for your shift 5 minutes before it starts.</li><li>You're in charge of setting up and breaking down the table.</li></ul>
+                    <p class="attach"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg> tabling-shifts.ics</p>
+                  </div>
+                </figure>
+                <figure class="email" aria-label="Example day-of email">
+                  <figcaption class="email-bar"><strong>Tuesday, 8:00 AM</strong><span>Tabling today at 11:00 AM</span></figcaption>
+                  <div class="email-body">
+                    <p>Hi Blake,</p>
+                    <p>You're tabling today:</p>
+                    <ul><li><strong>Tuesday, Nov 17: 11:00 AM to 12:00 PM (Board Member)</strong></li></ul>
+                    <p>Who else is on your shift:</p>
+                    <ul><li>Tuesday: Avery Brooks (Senior Board Member), Kit Farrow (On-Call)</li></ul>
+                    <p>Reminders:</p>
+                    <ul><li>Show up for your shift 5 minutes before it starts.</li><li>If you can't make it on time, contact the on-call Board Member (Kit Farrow) at least 20 minutes before your shift so they can fill in.</li></ul>
+                    <p class="attach"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg> tabling-shift.ics</p>
+                  </div>
+                </figure>
+              </div>
+              <p class="callout tip"><strong>The wording comes from your template.</strong> The role notes (arrive 5 minutes early, SBMs set up and break down, BMs contact the on-call person) are the same ones printed at the bottom of the weekly Excel sheet. Board Members' emails name that shift's on-call person, so they know who to contact.</p>
+              <p class="callout warn"><strong>Heads up.</strong> The message-building logic was tested locally against a real exported sheet, but the first run inside your Google account happens on your side. That's why step 4 sends a test to <em>you</em> before anything goes to the board.</p>
+            </section>
+
+            <section id="r-step-1" class="doc-step">
+              <h2><span class="num" aria-hidden="true">1</span> Get the Reminders sheet</h2>
+              <p>On the <a href="#/generate">Generate</a> tab, build your schedule, then press <strong>Download Reminders CSV</strong> in the results. It has one row per person per shift: the week, date, day, time, role, name and email.</p>
+              <figure>
+                <img src="img/tut-reminders-sheet.png" width="1200" height="520" loading="lazy" alt="A spreadsheet with columns Week, Date, Day, Time, Role, First Name, Last Name and Email, listing fictional people and their tabling shifts.">
+                <figcaption>The Reminders sheet (fictional people).</figcaption>
+              </figure>
+              <p class="callout warn"><strong>This file has real email addresses.</strong> Don't post it publicly or commit it to GitHub. Keep it in your Google account.</p>
+            </section>
+
+            <section id="r-step-2" class="doc-step">
+              <h2><span class="num" aria-hidden="true">2</span> Import it into Google Sheets</h2>
+              <ol class="steps-list">
+                <li>Open <a href="https://sheets.new" rel="noopener">sheets.new</a> to create a blank spreadsheet and name it something like <em>UMSBC tabling reminders</em>.</li>
+                <li>Choose <strong>File → Import → Upload</strong> and pick the CSV. Set <strong>Import location</strong> to <em>Replace current sheet</em>, and untick <em>Convert text to numbers, dates, and formulas</em>. Press <strong>Import data</strong>.</li>
+                <li>Rename the tab at the bottom to exactly <code>Reminders</code>.</li>
+                <li>Check <strong>File → Settings → Time zone</strong> is where you are (for UMass: Eastern).</li>
+              </ol>
+            </section>
+
+            <section id="r-step-3" class="doc-step">
+              <h2><span class="num" aria-hidden="true">3</span> Add the script</h2>
+              <ol class="steps-list">
+                <li>In the sheet, choose <strong>Extensions → Apps Script</strong>.</li>
+                <li>Delete the starter code, paste in the script below, and press the <strong>Save</strong> icon.</li>
+                <li>Set the script's time zone. Open <strong>Project Settings</strong> (gear icon), tick <em>Show "appsscript.json" manifest file in editor</em>, open <code>appsscript.json</code>, and set <code>"timeZone": "America/New_York"</code>.</li>
+              </ol>
+              <div class="script-actions">
+                <button type="button" class="btn btn-primary" id="copy-script">Copy the script</button>
+                <a class="btn btn-secondary" href="reminders/Code.gs" download="Code.gs">Download Code.gs</a>
+                <span class="help" id="copy-status" role="status" aria-live="polite"></span>
+              </div>
+              <details class="disclosure" id="script-details">
+                <summary>View the script</summary>
+                <div class="disclosure-body"><pre class="log code" id="script-view" tabindex="0">Loading…</pre></div>
+              </details>
+            </section>
+
+            <section id="r-step-4" class="doc-step">
+              <h2><span class="num" aria-hidden="true">4</span> Send yourself a test</h2>
+              <ol class="steps-list">
+                <li>Go back to the sheet and reload the page. A <strong>Tabling reminders</strong> menu appears next to Help.</li>
+                <li>Choose <strong>Tabling reminders → 1. Send a test email to me</strong>.</li>
+                <li>Google asks you to authorize the script. Choose your account, then <strong>Advanced → Go to (your project)</strong> and <strong>Allow</strong>. The "unverified app" warning is normal because the script lives in your own sheet. It can only act on your own Sheets and Gmail.</li>
+                <li>Check your inbox for two emails marked <strong>[TEST]</strong>: one Sunday-style and one day-of. Open the attached <code>.ics</code> to confirm it adds the shift to your calendar.</li>
+              </ol>
+              <p>Want to see who would be emailed before sending? Use <strong>2. Preview who will be emailed</strong>, then open <strong>Execution log</strong> in Apps Script.</p>
+            </section>
+
+            <section id="r-step-5" class="doc-step">
+              <h2><span class="num" aria-hidden="true">5</span> Turn it on</h2>
+              <ol class="steps-list">
+                <li>In the script, change <code>DRY_RUN: true</code> to <code>DRY_RUN: false</code> and save. Until you do, the automatic emails only write to a log.</li>
+                <li>In the sheet choose <strong>Tabling reminders → 3. Turn on automatic reminders</strong>.</li>
+              </ol>
+              <p>That's it. From now on the script emails people around 8 PM every Sunday (for the coming Monday to Sunday) and around 8 AM on the day of each shift. To stop, choose <strong>Turn off automatic reminders</strong>.</p>
+              <p class="callout tip"><strong>New schedule?</strong> Re-import the new CSV into the <code>Reminders</code> tab (<em>Replace current sheet</em>). The script remembers who it already emailed for each date, so nobody gets a duplicate.</p>
+            </section>
+
+            <section id="r-more" class="doc-step">
+              <h2>Settings &amp; troubleshooting</h2>
+              <p>The settings sit at the top of the script in <code>CONFIG</code>:</p>
+              <div class="table-scroll">
+                <table class="data">
+                  <thead><tr><th scope="col">Setting</th><th scope="col">What it does</th></tr></thead>
+                  <tbody>
+                    <tr><th scope="row"><code>SENDER_NAME</code></th><td>The name people see in the From line.</td></tr>
+                    <tr><th scope="row"><code>REPLY_TO</code></th><td>Optional address that replies go to, such as a club inbox.</td></tr>
+                    <tr><th scope="row"><code>TABLE_LOCATION</code></th><td>Optional. Where the table is. Shown in the emails and the calendar invite.</td></tr>
+                    <tr><th scope="row"><code>WEEKLY_HOUR</code> / <code>DAILY_HOUR</code></th><td>Hours (24-hour clock) for the Sunday and day-of emails. Google runs them within the hour. Run <em>Turn on automatic reminders</em> again after changing these.</td></tr>
+                    <tr><th scope="row"><code>ATTACH_CALENDAR_INVITE</code></th><td>Set to <code>false</code> to send emails without the <code>.ics</code> file.</td></tr>
+                    <tr><th scope="row"><code>DRY_RUN</code></th><td><code>true</code> only logs. <code>false</code> really sends.</td></tr>
+                  </tbody>
+                </table>
+              </div>
+              <dl class="defs">
+                <dt>Which address do the emails come from?</dt><dd>The Google account that owns the sheet. Create the sheet from a shared club Gmail if you want them to come from there.</dd>
+                <dt>Is there a sending limit?</dt><dd>Yes. Personal Gmail allows about 100 recipients a day and Google Workspace about 1,500. A typical week is around 24 Sunday emails plus a handful each morning, so you're well within it.</dd>
+                <dt>Emails went out at the wrong hour.</dt><dd>The script's time zone is probably not set. Check <code>appsscript.json</code> (step 3). The preview log prints the time zone it is using.</dd>
+                <dt>"There is no tab named Reminders."</dt><dd>Rename the tab to exactly <code>Reminders</code>.</dd>
+                <dt>Can I resend something?</dt><dd>Choose <strong>Forget what was already sent</strong>, then run <code>sendWeeklyReminders</code> or <code>sendDailyReminders</code> again from Apps Script.</dd>
+              </dl>
             </section>
           </article>
         </div>

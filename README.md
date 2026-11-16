@@ -46,3 +46,7 @@ A browser version lives in `docs/` and is published with GitHub Pages (Settings 
 - After changing `autoScheduler.py` or the Excel template, run `python scripts/sync_site.py` and commit `docs/`.
 - The example files and tutorial screenshots use fictional people (`scripts/make_example_data.py`).
 - To preview locally: `cd docs && python -m http.server 8000`, then open http://localhost:8000.
+
+### Reminder emails
+
+`docs/reminders/Code.gs` is a Google Apps Script that emails each person on Sunday night and the morning of their shift, with an `.ics` invite attached. The scheduler exports its input with `TablingScheduler.export_reminders_csv()` (also the "Download Reminders CSV" button on the site). That CSV contains email addresses: keep it out of the repo.

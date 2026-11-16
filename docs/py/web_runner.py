@@ -125,7 +125,7 @@ def run_schedule(avail_path, past_path, start_date, num_weeks, num_seniors, num_
         return json.dumps({
             'log': log.getvalue(), 'warnings': warnings, 'weeks': weeks, 'people': people,
             'unassigned': unassigned, 'slots': scheduler.time_slots, 'days': scheduler.days,
-            'xlsx': xlsx,
+            'xlsx': xlsx, 'reminders': scheduler.reminder_rows(),
         })
     except Exception as exc:
         return json.dumps({'error': f"Something went wrong while scheduling: {exc}", 'log': log.getvalue()})

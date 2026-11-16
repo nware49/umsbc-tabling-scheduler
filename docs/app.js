@@ -21,7 +21,7 @@
   }
 
   /* ------------------------------------------------------------------ routing */
-  const routes = ['generate', 'tutorial', 'formats', 'faq'];
+  const routes = ['generate', 'tutorial', 'reminders', 'formats', 'faq'];
   let firstRoute = true;
 
   function route() {
@@ -344,6 +344,7 @@
     const banner = $('#banner');
     const hasData = !result.error;
     $('#download').hidden = !hasData;
+    $('#reminders-cta').hidden = !hasData;
     $('#reshuffle').hidden = !hasData;
     $('.result-actions .help', section).hidden = !hasData;
     $('#week-tabs').replaceChildren();
@@ -481,6 +482,46 @@
     link.click();
     link.remove();
     setTimeout(() => URL.revokeObjectURL(url), 10000);
+  });
+
+  /* ------------------------------------------------------------------ reminders */
+  function csvCell(value) {
+    const text = String(value);
+    return /[",\n\r]/.test(text) ? `"${text.replace(/"/g, '""')}"` : text;
+  }
+
+  $('#download-reminders').addEventListener('click', () => {
+    if (!lastResult || !lastResult.reminders.length) return;
+    const columns = ['Week', 'Date', 'Day', 'Time', 'Role', 'First Name', 'Last Name', 'Email'];
+    const csv = [columns.join(','), ...lastResult.reminders.map((row) => columns.map((c) => csvCell(row[c])).join(','))].join('\r\n') + '\r\n';
+    const url = URL.createObjectURL(new Blob([csv], { type: 'text/csv' }));
+    const link = el('a', { href: url, download: `reminders_${lastOptions.startDate.replace(/-/g, '_')}.csv` });
+    document.body.append(link);
+    link.click();
+    link.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 10000);
+  });
+
+  let scriptText = null;
+  async function loadScript() {
+    if (scriptText !== null) return scriptText;
+    const res = await fetch('reminders/Code.gs');
+    if (!res.ok) throw new Error('Could not load the script');
+    scriptText = await res.text();
+    return scriptText;
+  }
+  $('#script-details').addEventListener('toggle', async (event) => {
+    if (!event.target.open) return;
+    try { $('#script-view').textContent = await loadScript(); } catch { $('#script-view').textContent = 'Could not load the script. Use Download Code.gs instead.'; }
+  });
+  $('#copy-script').addEventListener('click', async () => {
+    const status = $('#copy-status');
+    try {
+      await navigator.clipboard.writeText(await loadScript());
+      status.textContent = 'Copied. Paste it into the Apps Script editor.';
+    } catch {
+      status.textContent = 'Couldn\'t copy automatically. Use Download Code.gs, or open "View the script" and copy from there.';
+    }
   });
 
   /* ------------------------------------------------------------------ boot */
